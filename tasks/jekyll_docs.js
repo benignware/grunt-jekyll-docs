@@ -111,25 +111,43 @@ module.exports = function (grunt) {
         
         case '.md':
           
+          
           var dir = path.dirname(src);
           var dirMapObject = dirMap[dir];
           
           var output = "";
           
           if (!dirMapObject || dirMapObject.content === null) {
-            var name = path.basename(src).slice(0, -path.extname(src).length);
+            var filename = path.basename(src).slice(0, -path.extname(src).length);
+            var name = filename;
             
-            if (dirMapObject &&  dirMapObject.items.length > 1 || name == "README") {
-              name = path.basename(dir);
+            var relativePath = path.relative(this.data.dest, dest);
+            relativePath = relativePath.slice(0, -path.extname(relativePath).length);
+            
+            var isRoot = path.dirname(relativePath).indexOf('.') == 0;
+            
+            var permalinkBase = path.dirname(relativePath);
+            
+            if (dirMapObject &&  dirMapObject.items.length > 1 || name == "README" && !isRoot) {
+              relativePath = path.dirname(relativePath);
             }
+            
+            name = path.basename(relativePath);
+            relativePath = relativePath.slice(0, -name.length);
+            // strip extension
             var title = titleize(name, options.alias);
+            
             if (dirMapObject) {
               dirMapObject.content = "";
             }
+            
+            var permalink = relativePath.indexOf('.') != 0 ? relativePath + "/" : "";
+            permalink+= string(title).slugify();
+            
             output = "---\n";
             output+= "layout: \"" + options.layout + "\"\n"; 
             output+= "title: \"" + title + "\"\n";
-            output+= "permalink: /" + string(title).slugify() + "/\n";  
+            output+= "permalink: /" + permalink + "/\n";  
             output+= "---\n";
           }
           
@@ -223,6 +241,7 @@ module.exports = function (grunt) {
     }
     
     function processFiles() {
+      var target = this;
       if (this.data.dest && options.clean && grunt.file.isDir(this.data.dest)) {
         grunt.file['delete'](this.data.dest);
       }
@@ -250,7 +269,7 @@ module.exports = function (grunt) {
       });
       this.files.forEach(function(f) {
         f.src.forEach(function(src) {
-          processFile(src, f.dest);
+          processFile.call(target, src, f.dest);
         });
       });
     }
