@@ -1,3 +1,9 @@
+# Eclipse
+.project
+
+# Tests
+tmp
+
 # Logs
 logs
 *.log

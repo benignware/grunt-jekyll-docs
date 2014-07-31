@@ -1,0 +1,47 @@
+{
+  "name": "grunt-jekyll-docs",
+  "description": "This plugin helps you to build a jekyll-docs project from your source.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/benignware/grunt-jekyll-docs",
+  "author": {
+    "name": "Rafael Nowrotek",
+    "email": "mail@benignware.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benignware/grunt-jekyll-docs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/benignware/grunt-jekyll-docs/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/benignware/grunt-jekyll-docs/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-nodeunit": "^0.3.3",
+    "grunt": "~0.4.5"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.5"
+  },
+  "keywords": [
+    "gruntplugin"
+  ], 
+  "dependencies": {
+    "css": "", 
+    "deepmerge": "", 
+    "string": "", 
+    "nodegit": "0.1.3"
+  }
+}
