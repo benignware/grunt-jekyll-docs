@@ -31,28 +31,26 @@ module.exports = function(grunt) {
     // Configuration to be run (and then tested).
     jekyll_docs: {
       default_options: {
-        options: {
-          theme: {
-            dest: 'tmp'
-          }
-        }, 
-        dest: 'tmp/gen', 
+        dest: 'tmp', 
         cwd: 'test/fixtures', 
         expand: true,  
         src: [
           '**/*.md'
         ]
+      }, 
+      custom_options: {
+        options: {
+          css: {
+            wrap: true
+          }
+        },
+        dest: 'tmp', 
+        cwd: 'test/fixtures', 
+        expand: true,  
+        src: [
+          '**/*.{md,js,css}' 
+        ]
       }
-      // custom_options: {
-        // options: {
-          // css: {
-            // wrap: true
-          // }
-        // },
-        // files: {
-          // 'tmp/custom_options': ['test/fixtures/test.css']
-        // }
-      // }
     },
 
     // Unit tests.
