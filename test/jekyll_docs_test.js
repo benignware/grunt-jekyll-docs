@@ -37,6 +37,16 @@ exports.jekyll_docs = {
 
     test.done();
   },
+  custom_options: function(test) {
+    console.log("custom options");
+    test.expect(1);
+
+    var actual = grunt.file.read('tmp/gen/js/README.md');
+    var expected = grunt.file.read('test/expected/js/README.md');
+    test.equal(actual, expected, 'should describe what the default behavior is.');
+
+    test.done();
+  },
   // custom_options: function(test) {
     // test.expect(1);
 // 
