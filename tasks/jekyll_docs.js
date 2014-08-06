@@ -46,8 +46,11 @@ module.exports = function (grunt) {
     var options = merge({
       layout: 'page', 
       assets: [], 
-      pygxample: {
+      examples: {
+        manifest: 'manifest.json', 
+        build: 'examples'
       }, 
+      build: "gen", 
       clean: true, 
       css: {
       	wrap: false, 
@@ -61,18 +64,17 @@ module.exports = function (grunt) {
         'json': 'JSON'
       }, 
       theme: {
-        dest: null, 
         repository: 'git://github.com/rexblack/jekyll-docs.git'
       }
     }, this.options());
-
+    
     var assets = [];
     var dirMap = {};
       
     function cloneRepository(callback) {
       var target = this;
-      var themeDest = options.theme.dest;
-      if (options.theme.dest && !grunt.file.isDir(options.theme.dest)) {
+      var themeDest = this.data.dest;
+      if (themeDest && !grunt.file.isDir(themeDest)) {
         // download theme
         var repo_tmp = "tmp/.jekyll-docs";
         
@@ -82,11 +84,8 @@ module.exports = function (grunt) {
           }
           
           grunt.file.expand( {cwd: repo_tmp, filter: 'isFile'}, ['**/*']).forEach(function(file) {
-            // Remove file or folder in path
-            
-            // grunt.file['delete']({force: true}, path);
             var src = path.join(repo_tmp, file);
-            var dest = path.join(options.theme.dest, file);
+            var dest = path.join(themeDest, file);
             grunt.file.copy(src, dest);
           });
           
@@ -111,10 +110,8 @@ module.exports = function (grunt) {
         
         case '.md':
           
-          
           var dir = path.dirname(src);
           var dirMapObject = dirMap[dir];
-          
           var output = "";
           
           if (!dirMapObject || dirMapObject.content === null) {
@@ -163,12 +160,16 @@ module.exports = function (grunt) {
             if (dirMapObject && dirMapObject.items.length > 1) {
               dest = path.dirname(dest) + ".md";
             }
+            dest = path.join(this.data.dest, options.build, path.relative(this.data.dest, dest));
             grunt.file.write(dest, dirMapObject ? dirMapObject.content : output);
           }
           
           break;
           
         case '.css':
+        case '.js': 
+          
+          dest = path.join(this.data.dest, options.examples.build, path.relative(this.data.dest, dest));
           
           function handleCss(src, dest) {
             var contents = grunt.file.read(src);
@@ -223,15 +224,12 @@ module.exports = function (grunt) {
             grunt.file.write(dest, contents);
           }
           
-          handleCss(src, dest);
           assets = assets.concat(dest);
-          break;
-        
-        
-        case '.js': 
-        
-          assets = assets.concat(dest);
-          grunt.file.copy(src, dest);
+          if (type == ".css") {
+            handleCss(src, dest);
+          } else {
+            grunt.file.copy(src, dest);
+          }
           break;
         
         default: 
@@ -240,13 +238,21 @@ module.exports = function (grunt) {
       }
     }
     
+    
     function processFiles() {
       var target = this;
-      if (this.data.dest && options.clean && grunt.file.isDir(this.data.dest)) {
-        grunt.file['delete'](this.data.dest);
-      }
       
-      grunt.file.mkdir(this.data.dest);
+      var contentDir = path.join(this.data.dest, options.build);
+      if (options.clean && grunt.file.isDir(contentDir)) {
+        grunt.file['delete'](contentDir);
+      }
+      // grunt.file.mkdir(examplesDir);
+      
+      var examplesDir = path.join(this.data.dest, options.examples.build);
+      if (options.clean && grunt.file.isDir(examplesDir)) {
+        grunt.file['delete'](examplesDir);
+      }
+      // grunt.file.mkdir(examplesDir);
       
       // resolve external assets
       for (var x in this.data.src) {
@@ -276,15 +282,17 @@ module.exports = function (grunt) {
     
     
     function processManifest() {
-      var manifestFile = options.pygxample.manifest;
+      var manifestFile = path.join(this.data.dest, options.examples.build, options.examples.manifest);
+      console.log("manifestFile: ", manifestFile);
       if (manifestFile) {
         var assetUrls = assets.map(function(asset) {
           return url.parse(asset).host ? asset : path.relative(path.dirname(manifestFile), asset);
         });
-        var manifest = merge(options.pygxample, {
+        var manifest = merge(options.examples, {
           assets: assetUrls
         });
         delete manifest['manifest'];
+        delete manifest['build'];
         grunt.file.write(manifestFile, JSON.stringify(manifest, null, "\t"));
       }
     }
